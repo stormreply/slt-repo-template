@@ -7,7 +7,7 @@ locals {
 }
 
 locals {
-  _deployment = local._metadata.deployment
+  _tag_name = local._metadata.deployment
 }
 
 variable "_metadata" {
@@ -39,9 +39,8 @@ variable "_metadata" {
   }
 }
 
-output "_deployment" {
-  value = local._deployment
-
+output "_tag_name" {
+  value = local._tag_name
 }
 
 output "_metadata" {
