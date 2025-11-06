@@ -1,29 +1,24 @@
-name: Destroy
+name: Link
 
 permissions:
-  contents: read
-  id-token: write
+  read-all
 
 on:
-
   workflow_dispatch:
     # checkov:skip=CKV_GHA_7: "GitHub Actions workflow_dispatch inputs MUST be empty"
     inputs:
-      delay:
-        type: string
+      backend_account:
         required: false
-        default: ""
-      environment:
-        type: string
+      backend_region:
         required: false
-        default: ""
 
 jobs:
-  destroy:
-    uses: stormreply/slt-workflows/.github/workflows/destroy.yaml@main
+
+  link:
+    uses: stormreply/slt-workflows/.github/workflows/link.yaml@main
     with:
-      environment: ${{ inputs.environment }}
-      delay: ${{ inputs.delay }}
+      backend_account: ${{ inputs.backend_account || vars.BACKEND_ACCOUNT }}
+      backend_region: ${{ inputs.backend_region || vars.BACKEND_REGION }}
     secrets:
       STORM_LIBRARY_FOR_TERRAFORM: ${{ secrets.STORM_LIBRARY_FOR_TERRAFORM }}
       TERRAFORM_PRIVATE_KEY: ${{ secrets.TERRAFORM_PRIVATE_KEY }}
