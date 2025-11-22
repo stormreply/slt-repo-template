@@ -8,6 +8,9 @@
 *.tfstate
 *.tfstate.*
 
+# .tfplan files
+.tfplan
+
 # IDEA configurations
 .idea
 
