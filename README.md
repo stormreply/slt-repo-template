@@ -1,8 +1,3 @@
-# sakila-mysql-rds
-
-An implementation of the MySQL [Sakile Sample Database](https://dev.mysql.com/doc/sakila/en/)
-on AWS RDS
-
 #### Storm Library for Terraform
 
 This repository is a member of the SLT | Storm Library for Terraform, a collection of Terraform modules for Amazon Web Services. The focus of these modules, maintained in separate GitHub™ repositories, is on building examples, demos and showcases on AWS.
