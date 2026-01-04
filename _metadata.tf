@@ -14,7 +14,7 @@ variable "_metadata" {
   type = object({
     actor      = string # Github actor (deployer) of the deployment
     catalog_id = string # SLT catalog id of this module
-    deployment = string # slt-<catalod_id>-<repo>-<actor>>
+    deployment = string # slt-<catalod_id>-<repo>-<actor>
     ref        = string # Git reference of the deployment
     ref_name   = string # Git ref_name (branch) of the deployment
     repo       = string # GitHub short repository name (without owner) of the deployment

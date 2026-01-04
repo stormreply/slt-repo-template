@@ -13,16 +13,11 @@ on:
         type: string
         required: false
         default: ""
-      environment:
-        type: string
-        required: false
-        default: ""
 
 jobs:
   destroy:
     uses: stormreply/slt-workflows/.github/workflows/destroy.yaml@main
     with:
-      environment: ${{ inputs.environment }}
       delay: ${{ inputs.delay }}
     secrets:
       STORM_LIBRARY_FOR_TERRAFORM: ${{ secrets.STORM_LIBRARY_FOR_TERRAFORM }}
