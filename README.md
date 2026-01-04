@@ -6,5 +6,6 @@ of these modules, maintained in separate GitHub™ repositories, is on
 building examples, demos and showcases on AWS. The audience of the
 library is learners and presenters alike - people that want to know
 or show how a certain service, pattern or solution looks like, or "feels".
+
 [Learn more](https://github.com/stormreply/storm-library-for-terraform)
 
