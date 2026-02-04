@@ -25,5 +25,6 @@ jobs:
       lifetime: ${{ inputs.lifetime }}
       delay: ${{ inputs.delay }}
     secrets:
+      INFRACOST_API_KEY: ${{ secrets.INFRACOST_API_KEY }}
       STORM_LIBRARY_FOR_TERRAFORM: ${{ secrets.STORM_LIBRARY_FOR_TERRAFORM }}
       TERRAFORM_PRIVATE_KEY: ${{ secrets.TERRAFORM_PRIVATE_KEY }}

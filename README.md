@@ -35,7 +35,7 @@ Follow these steps in order to explore this demo:
 ## Terraform Docs
 
 <details>
-<summary>Klicke zum Anzeigen</summary>
+<summary>Click to show</summary>
 
 <!-- BEGIN_TF_DOCS -->
 <!-- END_TF_DOCS -->
