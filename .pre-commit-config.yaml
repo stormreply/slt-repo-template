@@ -1,4 +1,12 @@
 repos:
+- repo: local
+  hooks:
+    - id: prepare-pre-commit
+      name: "prepare pre-commit"
+      entry: bash ./.support/prepare-pre-commit.sh
+      language: system
+      pass_filenames: false
+      always_run: true
 - repo: https://github.com/pre-commit/pre-commit-hooks
   rev: v5.0.0
   hooks:
@@ -9,10 +17,15 @@ repos:
   hooks:
     - id: terraform_fmt
     - id: terraform_docs
+      args:
+        - --args=--output-file=README.new
+        - --args=--output-mode=inject
     - id: terraform_tflint
-    - id: terraform_trivy
+    # - id: terraform_trivy
     - id: terraform_validate
-#    - id: terrascan
+      args:
+        - --hook-config=--retry-once-with-cleanup=true
+        - --tf-init-args=-backend=false
     - id: terraform_checkov
       args:
         - --args=--quiet
@@ -20,3 +33,11 @@ repos:
   rev: a248f9279b38aeff5bbd4c85cc6f15b64d27e794  # frozen: v8.27.0
   hooks:
   - id: gitleaks
+- repo: local
+  hooks:
+    - id: finish-pre-commit
+      name: "finish pre-commit"
+      entry: bash ./.support/finish-pre-commit.sh
+      language: system
+      pass_filenames: false
+      always_run: true

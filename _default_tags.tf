@@ -29,3 +29,7 @@ locals {
     : {}
   )
 }
+
+output "_default_tags" {
+  value = local._default_tags
+}

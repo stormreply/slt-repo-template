@@ -20,7 +20,7 @@ variable "_metadata" {
     repo       = string # GitHub short repository name (without owner) of the deployment
     repository = string # GitHub full repository name (including owner) of the deployment
     sha        = string # Git (full-length, 40 char) commit SHA of the deployment
-    short_name = string # slt-<cat>-<actor>
+    short_name = string # slt-<catalog_id>-<actor>
     time       = string # Timestamp of the deployment
   })
   default = {
