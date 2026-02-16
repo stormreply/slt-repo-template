@@ -38,9 +38,14 @@ variable "_metadata" {
 }
 
 output "_name_tag" {
-  value = local._name_tag
+  description = <<-EOF
+    Name to be used as name property of your resources. If you happen to have multiple
+    resources of the same type, use sth like "${local._name_tag}-<I>purpose</I>".
+  EOF
+  value       = local._name_tag
 }
 
 output "_metadata" {
-  value = var._metadata
+  description = "Select metadata passed from GitHub Workflows"
+  value       = var._metadata
 }

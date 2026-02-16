@@ -31,5 +31,6 @@ locals {
 }
 
 output "_default_tags" {
-  value = local._default_tags
+  description = "Default tags to be used in Terraform provider, cf. providers.tf"
+  value       = local._default_tags
 }
