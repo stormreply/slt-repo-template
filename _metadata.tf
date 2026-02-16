@@ -41,7 +41,7 @@ variable "_metadata" {
 output "_name_tag" {
   description = <<-EOF
     Name to be used as name property of your resources. If you happen to have multiple
-    resources of the same type, use sth like "${local._name_tag}-<I>purpose</I>".
+    resources of the same type, append your <I>-purpose</I> to the name tag.
   EOF
   value       = local._name_tag
 }
