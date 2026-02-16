@@ -11,6 +11,7 @@ locals {
 }
 
 variable "_metadata" {
+  description = "Select metadata passed from GitHub Workflows"
   type = object({
     actor      = string # Github actor (deployer) of the deployment
     catalog_id = string # SLT catalog id of this module
