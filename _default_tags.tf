@@ -26,7 +26,11 @@ locals {
 
     var._metadata.sha != ""
     ? { deployment-sha = var._metadata.repository != "" ? substr(var._metadata.sha, 0, 7) : "" }
-    : {}
+    : {},
+
+    var._metadata.deployment != ""
+    ? { Name = var._metadata.deployment }
+    : {},
   )
 }
 
