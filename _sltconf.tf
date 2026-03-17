@@ -64,7 +64,8 @@ locals {
     var._metadata.short_name == "" ? { short_name = basename(abspath(path.module)) } : {}
   )
 
-  _name_tag = local._metadata.deployment
+  _deployment = local._metadata.deployment
+  _name_tag   = local._metadata.deployment
 
   _slt_offset             = tonumber(coalesce(try(local._metadata.catalog_id, "0"), "0"))
   _slt_172_31_subnet_cidr = "172.31.${128 + local._slt_offset}.0/24"
@@ -78,16 +79,18 @@ output "_default_tags" {
   value       = local._default_tags
 }
 
+output "_deployment" {
+  description = "Value to be used as name property of your resources. If you happen to have multiple resources of the same type, append your <I>-purpose</I> to the <I>_deployment</I> value."
+  value       = local._deployment
+}
+
 output "_metadata" {
   description = "Select metadata passed from GitHub Workflows"
   value       = var._metadata
 }
 
 output "_name_tag" {
-  description = <<-EOF
-    Name to be used as name property of your resources. If you happen to have multiple
-    resources of the same type, append your <I>-purpose</I> to the name tag.
-  EOF
+  description = "Name to be used as name property of your resources. OBSOLETE. Use local._deployment instead."
   value       = local._name_tag
 }
 
