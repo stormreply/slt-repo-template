@@ -85,7 +85,7 @@ for rel in "${TEMPLATE_FILES[@]}"; do
 
     if [[ "$(checksum "$template_file")" == "$(checksum "$target_file")" ]]; then
         pass "$rel"
-    elif [[ "$rel" == .github/* || "$rel" == .support/* ]]; then
+    elif [[ "$rel" == .github/* || "$rel" == .support/* || "$rel" == _sltconf.tf ]]; then
         cp "$template_file" "$target_file"
         copied "$rel" "overwritten from template"
     else
