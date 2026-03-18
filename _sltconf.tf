@@ -74,32 +74,20 @@ locals {
 
 
 
-output "_default_tags" {
-  description = "Default tags to be used in Terraform provider, cf. providers.tf"
-  value       = local._default_tags
+locals {
+  _slt_config = {
+    default_tags         = local._default_tags
+    deployment           = local._deployment
+    metadata             = local._metadata
+    name_tag             = local._name_tag
+    assigned_subnet_cidr = local._slt_172_31_subnet_cidr
+    assigned_vpc_cidr    = local._slt_172_16_vpc_cidr
+  }
 }
 
-output "_deployment" {
-  description = "Value to be used as name property of your resources. If you happen to have multiple resources of the same type, append your <I>-purpose</I> to the <I>_deployment</I> value."
-  value       = local._deployment
-}
 
-output "_metadata" {
-  description = "Select metadata passed from GitHub Workflows"
-  value       = var._metadata
-}
 
-output "_name_tag" {
-  description = "Name to be used as name property of your resources. OBSOLETE. Use local._deployment instead."
-  value       = local._name_tag
-}
-
-output "_slt_172_31_subnet_cidr" {
-  description = "Subnet CIDR to be used for subnets in the default VPC"
-  value       = local._slt_172_31_subnet_cidr
-}
-
-output "_slt_172_16_vpc_cidr" {
-  description = "CIDR to be used if new VPCs need to be created"
-  value       = local._slt_172_16_vpc_cidr
+output "_slt_config" {
+  description = "Map of SLT configuration"
+  value       = local._slt_config
 }
