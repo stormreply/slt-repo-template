@@ -11,12 +11,30 @@ TARGET_DIR="$(pwd)"
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
+CYAN='\033[0;36m'
 BOLD='\033[1m'
 NC='\033[0m'
 
 CHECKS=0
 FAILURES=0
 declare -a DIFFS=()   # pairs: template_file target_file rel_path (3 elements each)
+
+# Files where differing content vs. the template is allowed (not overwritten).
+declare -a ALLOW_DIFF=(
+    "providers.tf"
+    "terraform.tf"
+)
+
+# Files to always delete from TARGET_DIR if present.
+declare -a DELETE_FILES=(
+    "_metadata.tf"
+    "_default_tags.tf"
+)
+
+# Patterns that must not appear in any .tf file in TARGET_DIR.
+declare -a UNWANTED_PATTERNS=(
+    "local._name_tag"
+)
 
 checksum() {
     if command -v sha256sum &>/dev/null; then
@@ -27,8 +45,8 @@ checksum() {
 }
 
 pass()   { echo -e "  ${GREEN}[PASS]${NC}    $1";              CHECKS=$((CHECKS + 1)); }
-fail()   { echo -e "  ${RED}[FAIL]${NC}    $1${2:+  ($2)}";   CHECKS=$((CHECKS + 1)); FAILURES=$((FAILURES + 1)); }
-extra()  { echo -e "  ${YELLOW}[EXTRA]${NC}   $1${2:+  ($2)}"; CHECKS=$((CHECKS + 1)); FAILURES=$((FAILURES + 1)); }
+fail()   { echo -e "  ${RED}[FAIL]${NC}    $1${2:+  ($2)}";    CHECKS=$((CHECKS + 1)); FAILURES=$((FAILURES + 1)); }
+hint()   { echo -e "  ${CYAN}[HINT]${NC}    $1${2:+  ($2)}";   CHECKS=$((CHECKS + 1)); }
 copied() { echo -e "  ${YELLOW}[COPY]${NC}    $1  ($2)";       CHECKS=$((CHECKS + 1)); }
 deleted(){ echo -e "  ${YELLOW}[DELETED]${NC} $1${2:+  ($2)}"; CHECKS=$((CHECKS + 1)); }
 
@@ -44,7 +62,6 @@ echo "$DIVIDER"
 # ── Collect template files ──────────────────────────────────────────────────
 
 declare -a TEMPLATE_FILES=()
-declare -a TEMPLATE_UNDERSCORE_NAMES=()
 
 add_dir() {
     local dir="$1"
@@ -59,7 +76,8 @@ add_dir ".github/workflows"
 add_dir ".support"
 
 for f in "_sltconf.tf" "providers.tf" "terraform.tf"; do
-    [[ -f "$TEMPLATE_ROOT/$f" ]] && TEMPLATE_FILES+=("$f")
+    [[ -f "$TEMPLATE_ROOT/$f" ]] && \
+    TEMPLATE_FILES+=("$f")
 done
 
 # ── File integrity ──────────────────────────────────────────────────────────
@@ -70,9 +88,6 @@ echo ""
 
 for rel in "${TEMPLATE_FILES[@]}"; do
     # Track root-level underscore filenames for the next section
-    fname="$(basename "$rel")"
-    [[ "$fname" == _* && "$rel" != */* ]] && TEMPLATE_UNDERSCORE_NAMES+=("$fname")
-
     template_file="$TEMPLATE_ROOT/$rel"
     target_file="$TARGET_DIR/$rel"
 
@@ -85,41 +100,56 @@ for rel in "${TEMPLATE_FILES[@]}"; do
 
     if [[ "$(checksum "$template_file")" == "$(checksum "$target_file")" ]]; then
         pass "$rel"
-    elif [[ "$rel" == .github/* || "$rel" == .support/* || "$rel" == _sltconf.tf ]]; then
+    elif [[ " ${ALLOW_DIFF[*]} " == *" $rel "* ]]; then
+        hint "$rel" "differs from template (allowed)"
+        DIFFS+=("$template_file" "$target_file" "$rel")
+    else
         cp "$template_file" "$target_file"
         copied "$rel" "overwritten from template"
-    else
-        fail "$rel" "checksum mismatch"
-        DIFFS+=("$template_file" "$target_file" "$rel")
     fi
 done
 
-# ── Underscore file check ───────────────────────────────────────────────────
+# ── File cleanup ───────────────────────────────────────────────────────────
 
 echo ""
-echo -e "${BOLD}Underscore file check (root level)${NC}"
+echo -e "${BOLD}File cleanup${NC}"
 echo ""
 
-extra_found=false
-while IFS= read -r -d '' f; do
-    fname="$(basename "$f")"
-    known=false
-    for k in "${TEMPLATE_UNDERSCORE_NAMES[@]+"${TEMPLATE_UNDERSCORE_NAMES[@]}"}"; do
-        [[ "$k" == "$fname" ]] && known=true && break
-    done
-    if ! $known; then
-        if [[ "$fname" == *.tf ]]; then
-            rm "$f"
-            deleted "$fname" "not in template, removed"
-        else
-            extra "$fname" "not present in template"
-        fi
-        extra_found=true
+cleanup_found=false
+for fname in "${DELETE_FILES[@]}"; do
+    target_file="$TARGET_DIR/$fname"
+    if [[ -f "$target_file" ]]; then
+        rm "$target_file"
+        deleted "$fname" "listed for removal, deleted"
+        cleanup_found=true
     fi
-done < <(find "$TARGET_DIR" -maxdepth 1 -type f -name '_*' -print0 2>/dev/null | sort -z)
+done
 
-if ! $extra_found; then
-    pass "no extra underscore files at root level"
+if ! $cleanup_found; then
+    pass "no files to clean up"
+fi
+
+# ── Pattern check ──────────────────────────────────────────────────────────
+
+echo ""
+echo -e "${BOLD}Pattern check (.tf files)${NC}"
+echo ""
+
+pattern_issues=false
+while IFS= read -r -d '' f; do
+    rel="${f#"$TARGET_DIR"/}"
+    [[ "$(basename "$f")" == "_sltconf.tf" ]] && continue
+    for pattern in "${UNWANTED_PATTERNS[@]}"; do
+        if grep -qF "$pattern" "$f"; then
+            fail "$rel" "contains unwanted pattern: $pattern"
+            pattern_issues=true
+        fi
+    done
+done < <(find "$TARGET_DIR" -type f -name '*.tf' \
+    -not -path '*/.terraform/*' -print0 2>/dev/null | sort -z)
+
+if ! $pattern_issues; then
+    pass "no unwanted patterns found"
 fi
 
 # ── Diffs ───────────────────────────────────────────────────────────────────
@@ -137,7 +167,7 @@ if (( ${#DIFFS[@]} > 0 )); then
 
         echo ""
         echo "$DIVIDER"
-        echo -e "  ${RED}${BOLD}$rel${NC}"
+        echo -e "  ${CYAN}${BOLD}$rel${NC}"
         echo "$DIVIDER"
         diff --unified=3 \
             --label "template/$rel" \
