@@ -47,7 +47,8 @@ checksum() {
 pass()   { echo -e "  ${GREEN}[PASS]${NC}    $1";              CHECKS=$((CHECKS + 1)); }
 fail()   { echo -e "  ${RED}[FAIL]${NC}    $1${2:+  ($2)}";    CHECKS=$((CHECKS + 1)); FAILURES=$((FAILURES + 1)); }
 hint()   { echo -e "  ${CYAN}[HINT]${NC}    $1${2:+  ($2)}";   CHECKS=$((CHECKS + 1)); }
-copied() { echo -e "  ${YELLOW}[COPY]${NC}    $1  ($2)";       CHECKS=$((CHECKS + 1)); }
+copied() { echo -e "  ${YELLOW}[COPY]${NC}    $1  ($2)";       CHECKS=$((CHECKS + 1)); FAILURES=$((FAILURES + 1)); }
+synced() { echo -e "  ${YELLOW}[SYNC]${NC}    $1  ($2)";       CHECKS=$((CHECKS + 1)); FAILURES=$((FAILURES + 1)); }
 deleted(){ echo -e "  ${YELLOW}[DELETED]${NC} $1${2:+  ($2)}"; CHECKS=$((CHECKS + 1)); }
 
 DIVIDER="────────────────────────────────────────────────────────"
@@ -76,8 +77,7 @@ add_dir ".github/workflows"
 add_dir ".support"
 
 for f in "_sltconf.tf" "providers.tf" "terraform.tf"; do
-    [[ -f "$TEMPLATE_ROOT/$f" ]] && \
-    TEMPLATE_FILES+=("$f")
+    [[ -f "$TEMPLATE_ROOT/$f" ]] && TEMPLATE_FILES+=("$f")
 done
 
 # ── File integrity ──────────────────────────────────────────────────────────
@@ -105,7 +105,7 @@ for rel in "${TEMPLATE_FILES[@]}"; do
         DIFFS+=("$template_file" "$target_file" "$rel")
     else
         cp "$template_file" "$target_file"
-        copied "$rel" "overwritten from template"
+        synced "$rel" "overwritten from template"
     fi
 done
 
