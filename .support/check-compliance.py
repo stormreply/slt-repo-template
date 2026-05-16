@@ -158,32 +158,44 @@ def main() -> int:
 
     repo_listing = build_repo_listing(files)
 
-    system_prompt = (
-        "Du bist ein erfahrener Compliance- und Security-Auditor für "
-        "Software-Repositories. Du erhältst eine Compliance-Definition in "
-        "Markdown und eine Auswahl an Repo-Dateien. Prüfe systematisch jede "
-        "Regel der Definition gegen den Repo-Inhalt.\n\n"
-        "Antworte ausschließlich in Markdown mit folgender Struktur:\n"
-        "1. Eine Zusammenfassung (1-3 Sätze).\n"
-        "2. Eine Tabelle mit Spalten: Regel | Status (PASS/FAIL/UNCLEAR) | Begründung.\n"
-        "3. Einen Abschnitt 'Findings' mit Details pro Verstoß: "
-        "Severity (HIGH/MEDIUM/LOW), betroffene Datei(en), konkrete Empfehlung.\n"
-        "4. Falls keine Verstöße gefunden wurden, mache das explizit deutlich.\n\n"
-        "Sei präzise, halluziniere keine Dateinamen und zitiere nur, was "
-        "tatsächlich im gelieferten Material steht.\n\n"
-        "----- COMPLIANCE DEFINITION (Markdown) -----\n"
-        f"{compliance_text}"
-    )
+    system_prompt = f"""
+        You need to check a list of files from a repository for compliance.
+        Compliance will be defined in a list of requirements in a markdown
+        document. Check each requirement with the list of files. As a result
+        of the check, return a json list named compliance with the following
+        specification:
+
+        1. If a compliance requirement can not be met by all files, add an
+           item to the result list.
+        2. Every item is a json object consisting of
+           - requirement: the original, unchanged compliance requirement
+           - findings: all findings in all files where the compliance
+             requirement has been violated, where possible with line
+             numbers
+        3. If all compliance requirements have been met in all files,
+           return an empty json list
+
+        The markdown document containing the compliance requirements is
+        attached below:
+
+
+    """
 
     user_prompt = (
-        "Bitte prüfe das folgende Repository gegen die Compliance-Definition.\n\n"
-        f"{repo_listing}"
+        """
+        Please check the following files against the compliance definition:
+
+        {repo_listing}
+        """
     )
 
-    report = call_bedrock(model_id, region, system_prompt, user_prompt)
+    print(system_prompt)
+    print(user_prompt)
 
-    print(report)
-    write_step_summary(report)
+    # report = call_bedrock(model_id, region, system_prompt, user_prompt)
+
+    # print(report)
+    # write_step_summary(report)
     return 0
 
 
