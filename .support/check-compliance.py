@@ -178,7 +178,7 @@ def main() -> int:
         The markdown document containing the compliance requirements is
         attached below:
 
-
+        {compliance_text}
     """
 
     user_prompt = (
