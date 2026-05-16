@@ -10,7 +10,6 @@ Konfiguration via Environment-Variablen:
   BEDROCK_MODEL_ID   - Bedrock Model-ID bzw. Inference-Profile-ID
                        (z.B. us.anthropic.claude-sonnet-4-6-YYYYMMDD-v1:0)
   COMPLIANCE_FILE    - Pfad zur Compliance-Markdown-Datei (Default: compliance/compliance.md)
-  GITHUB_STEP_SUMMARY - wird von GitHub Actions automatisch gesetzt
 """
 
 from __future__ import annotations
@@ -133,7 +132,7 @@ def write_step_summary(report: str) -> None:
 def main() -> int:
     region = os.environ.get("AWS_REGION")
     model_id = os.environ.get("BEDROCK_MODEL_ID")
-    compliance_file = os.environ.get("COMPLIANCE_FILE", "compliance/compliance.md")
+    compliance_file = os.environ.get("COMPLIANCE_FILE", "slt-repo-template/.support/compliance.md")
 
     if not region or not model_id:
         print(
@@ -154,7 +153,7 @@ def main() -> int:
 
     repo_root = Path.cwd()
     files = collect_repo_files(repo_root)
-    print(f"Sammle {len(files)} Dateien zur Prüfung ein.", file=sys.stderr)
+    print(f"Collecting {len(files)} files for compliance check.", file=sys.stderr)
 
     repo_listing = build_repo_listing(files)
 
@@ -181,13 +180,11 @@ def main() -> int:
         {compliance_text}
     """
 
-    user_prompt = (
-        """
+    user_prompt = f"""
         Please check the following files against the compliance definition:
 
         {repo_listing}
-        """
-    )
+    """
 
     print(system_prompt)
     print(user_prompt)
