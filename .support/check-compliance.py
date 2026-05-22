@@ -161,10 +161,11 @@ def main() -> int:
     print(system_prompt)
     print(user_prompt)
 
-    # report = call_bedrock(model_id, region, system_prompt, user_prompt)
+    report = call_bedrock(model_id, region, system_prompt, user_prompt)
 
-    # print(report)
-    # write_step_summary(report)
+    print(report)
+    write_step_summary(report)
+
     return 0
 
 
