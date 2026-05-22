@@ -96,9 +96,12 @@ def write_step_summary(report: str) -> None:
     if not summary_path:
         return
     with open(summary_path, "a", encoding="utf-8") as f:
-        f.write("# Bedrock Compliance Check\n\n")
-        f.write(report)
-        f.write("\n")
+        if report:
+            f.write("## Issues have been found during compliance check:")
+            f.write(report)
+            f.write("\n")
+        else:
+            f.write('## No compliance issues found.')
 
 
 def main() -> int:
