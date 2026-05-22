@@ -14,7 +14,6 @@ Konfiguration via Environment-Variablen:
 
 from __future__ import annotations
 
-import json
 import os
 import sys
 from pathlib import Path
@@ -23,73 +22,47 @@ import boto3
 from botocore.exceptions import ClientError
 
 
-# Dateiendungen, die wir als Text an das Modell schicken
-TEXT_EXTENSIONS = {
-    ".py", ".js", ".ts", ".tsx", ".jsx", ".mjs", ".cjs",
-    ".go", ".java", ".kt", ".rb", ".rs", ".php", ".cs",
-    ".c", ".h", ".cpp", ".hpp",
-    ".sh", ".bash", ".zsh",
-    ".yml", ".yaml", ".json", ".toml", ".ini", ".cfg",
-    ".md", ".rst", ".txt",
-    ".tf", ".tfvars", ".hcl",
-    ".sql", ".graphql", ".proto",
-    ".html", ".css", ".scss",
-}
+INCLUDED_FILES = [
+    ".gitignore",
+    ".pre-commit-config.yaml",
+    ".github/workflows/apply.yaml",
+    ".github/workflows/destroy.yaml",
+    ".github/workflows/plan.yaml",
+    ".github/workflows/test.yaml",
+    ".support/check-commit.sh",
+    ".support/check-compliance.py",
+    ".support/check-files.sh",
+    ".support/compliance.md",
+    ".support/finish-pre-commit.sh",
+    ".support/prepare-pre-commit.sh",
+    ".support/slt-check.sh",
+    "README.md",
+    "_sltconf.tf",
+    "providers.tf",
+    "terraform.tf",
+]
 
-EXTRA_FILENAMES = {
-    "Dockerfile", "Makefile", ".gitignore", ".dockerignore",
-    ".env.example", "requirements.txt", "package.json",
-    "go.mod", "Cargo.toml", "pom.xml",
-}
-
-# Ordner, die wir komplett überspringen
-IGNORED_DIRS = {
-    ".git", ".github", "node_modules", ".venv", "venv", "env",
-    "__pycache__", "dist", "build", "target", ".next", ".cache",
-    "vendor", "coverage", ".idea", ".vscode",
-}
-
-# Max. Bytes Repo-Content, die wir ans Modell senden (Schutz gegen Riesen-Repos)
-MAX_TOTAL_BYTES = 400_000
-# Max. Bytes pro Einzeldatei
 MAX_FILE_BYTES = 60_000
 
 
 def collect_repo_files(root: Path) -> list[tuple[Path, str]]:
-    """Sammelt textuelle Repo-Dateien bis MAX_TOTAL_BYTES."""
     collected: list[tuple[Path, str]] = []
-    total = 0
 
-    for path in sorted(root.rglob("*")):
-        if not path.is_file():
-            continue
-        if any(part in IGNORED_DIRS for part in path.parts):
-            continue
-        if path.suffix not in TEXT_EXTENSIONS and path.name not in EXTRA_FILENAMES:
-            continue
-
+    for rel in INCLUDED_FILES:
+        path = root / rel
         try:
             data = path.read_bytes()
         except OSError:
+            print(f"::warning::Datei nicht gefunden oder nicht lesbar: {rel}", file=sys.stderr)
             continue
 
         if len(data) > MAX_FILE_BYTES:
-            # Datei zu groß -> nur Anfang nehmen + Hinweis
             text = data[:MAX_FILE_BYTES].decode("utf-8", errors="replace")
             text += f"\n\n[... gekürzt, Originalgröße {len(data)} Bytes ...]"
         else:
             text = data.decode("utf-8", errors="replace")
 
-        if total + len(text) > MAX_TOTAL_BYTES:
-            print(
-                f"::warning::Größenlimit erreicht bei {path}; "
-                f"weitere Dateien werden ausgelassen.",
-                file=sys.stderr,
-            )
-            break
-
-        collected.append((path.relative_to(root), text))
-        total += len(text)
+        collected.append((Path(rel), text))
 
     return collected
 
