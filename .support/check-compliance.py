@@ -133,18 +133,31 @@ def main() -> int:
         You need to check a list of files from a repository for compliance.
         Compliance will be defined in a list of requirements in a markdown
         document. Check each requirement with the list of files. As a result
-        of the check, return a json list named compliance with the following
+        of the check, return a markdown document with the following
         specification:
 
-        1. If a compliance requirement can not be met by all files, add an
-           item to the result list.
-        2. Every item is a json object consisting of
-           - requirement: the original, unchanged compliance requirement
-           - findings: all findings in all files where the compliance
-             requirement has been violated, where possible with line
-             numbers
+        1. If a compliance requirement can not be met, add a list item
+           to the markdown document.
+
+        2. Every list item must be of the following form:
+
+           <requirement>:
+             - <finding>
+
+           where <requirement> is the wording of the requirement as defined in
+           the list of requirements, and <finding> is a concise description
+           of the found violation of the requirement. Where possible, include
+           a filename and a line number in the finding. If multiple findings
+           have been found for a single requirement, list them all underneath
+           that very requirement.
+
         3. If all compliance requirements have been met in all files,
-           return an empty json list
+           return an empty string.
+
+        4. If compliance issues have been found, return the list as outlined
+           above as a markdown document in a single string.
+
+        5. Do not add anything else to the markdown document.
 
         The markdown document containing the compliance requirements is
         attached below:
