@@ -97,7 +97,9 @@ def write_step_summary(report: str) -> None:
         return
     with open(summary_path, "a", encoding="utf-8") as f:
         if report:
-            f.write("**Issues have been found during compliance check:**\n\n")
+            f.write("> [!CAUTION]")
+            f.write("> Issues have been found during compliance check. See below.")
+            f.write("\n")
             f.write(report)
             f.write("\n")
         else:
