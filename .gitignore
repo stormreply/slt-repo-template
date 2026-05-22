@@ -19,3 +19,9 @@
 
 # vi(m) swap files
 **/*.sw?
+
+# Python virtual environment
+.venv
+.python-version
+pyproject.toml
+uv.lock
