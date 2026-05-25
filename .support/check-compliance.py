@@ -165,7 +165,8 @@ def main() -> int:
         4. If compliance issues have been found, return the list as outlined
            above as a markdown document in a single string.
 
-        5. Do not add anything else to the markdown document.
+        5. Do not add anything else to the markdown document, just the list
+           as a single string. Especially, do not add any summary.
 
         The markdown document containing the compliance requirements is
         attached below:
@@ -184,7 +185,7 @@ def main() -> int:
 
     report = call_bedrock(model_id, region, system_prompt, user_prompt)
 
-    # print(report)
+    print(report)
 
     return(write_step_summary(report))
 
