@@ -84,7 +84,7 @@ def call_bedrock(model_id: str, region: str, system_prompt: str, user_prompt: st
             inferenceConfig={"maxTokens": 8000, "temperature": 0},
         )
     except ClientError as e:
-        print(f"::error::Bedrock-Aufruf fehlgeschlagen: {e}", file=sys.stderr)
+        print(f"::error::Bedrock-call failed: {e}", file=sys.stderr)
         raise
 
     content = response["output"]["message"]["content"]
@@ -99,13 +99,11 @@ def write_step_summary(report: str) -> int:
     with open(summary_path, "a", encoding="utf-8") as f:
         if report:
             f.write("> [!CAUTION]\n")
-            f.write("> Issues have been found during compliance check. See below\n")
-            f.write("\n")
+            f.write("> Issues have been found during compliance check. See below:\n")
             f.write(report)
-            f.write("\n")
             return 1
         else:
-            f.write("No compliance issues found.\n")
+            f.write("No compliance issues found.")
             return 0
 
 

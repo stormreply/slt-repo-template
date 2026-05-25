@@ -264,25 +264,18 @@ md_summary() {
 
 write_step_summary() {
     report=$1
-    if [ -n "$report" ] ; then
-        cat << EOF
+    cat << EOF
 > [!CAUTION]
-> Issues have been found during file check. See below:
-
+> Issues have been found during file check. Check below:
 $report
 EOF
-    else
-        echo "No compliance issues found."
-    fi
 }
 
 
 if (( FAILURES > 0 )); then
-
     report=$(md_summary)
-    # echo "$report"
-    [[ -n "${GITHUB_STEP_SUMMARY:-}" ]] \
-    && write_step_summary "$report" >> $GITHUB_STEP_SUMMARY
-
+    write_step_summary "$report" >> ${GITHUB_STEP_SUMMARY:-/dev/stdout}
     exit 1
+else
+    echo "No compliance issues found."
 fi
