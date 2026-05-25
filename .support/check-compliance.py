@@ -93,19 +93,19 @@ def call_bedrock(model_id: str, region: str, system_prompt: str, user_prompt: st
 
 
 def write_step_summary(report: str) -> int:
+    has_issues = bool(report) and report != "No issues found."
     summary_path = os.environ.get("GITHUB_STEP_SUMMARY")
-    if not summary_path:
-        return 2
-    with open(summary_path, "a", encoding="utf-8") as f:
-        if report != "No issues found.":
-            f.write("> [!CAUTION]\n")
-            f.write("> Issues have been found during compliance check. Check below:\n")
-            f.write("\n")
-            f.write(report)
-            return 1
-        else:
-            f.write(report)
-            return 0
+    if summary_path:
+        with open(summary_path, "a", encoding="utf-8") as f:
+            if has_issues:
+                f.write("> [!CAUTION]\n")
+                f.write("> Issues have been found during compliance check. Check below:\n")
+                f.write("\n")
+                f.write(report)
+                f.write("\n")
+            else:
+                f.write("No compliance issues found.\n")
+    return 1 if has_issues else 0
 
 
 def main() -> int:
