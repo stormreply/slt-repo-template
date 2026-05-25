@@ -23,21 +23,22 @@ from botocore.exceptions import ClientError
 
 
 INCLUDED_FILES = [
-    ".gitignore",
-    ".pre-commit-config.yaml",
     ".github/workflows/apply.yaml",
     ".github/workflows/destroy.yaml",
     ".github/workflows/plan.yaml",
     ".github/workflows/test.yaml",
+    ".gitignore",
+    ".pre-commit-config.yaml",
     ".support/check-commit.sh",
     # ".support/check-compliance.py",
     ".support/check-files.sh",
     # ".support/compliance.md",
     ".support/finish-pre-commit.sh",
     ".support/prepare-pre-commit.sh",
-    "README.md",
+    "assets/architecture.drawio",
     "_sltconf.tf",
     "providers.tf",
+    "README.md",
     "terraform.tf",
 ]
 
