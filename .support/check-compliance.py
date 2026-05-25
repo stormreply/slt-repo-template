@@ -184,7 +184,6 @@ def main() -> int:
     report = call_bedrock(model_id, region, system_prompt, user_prompt)
 
     # print(report)
-    write_step_summary(report)
 
     return(write_step_summary(report))
 
