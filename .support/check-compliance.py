@@ -159,14 +159,15 @@ def main() -> int:
            have been found for a single requirement, list them all underneath
            that very requirement.
 
-        3. If all compliance requirements have been met in all files,
-           return an empty string.
-
-        4. If compliance issues have been found, return the list as outlined
+        3. If compliance issues have been found, return the list as outlined
            above as a markdown document in a single string.
 
+        4. If no issues have been found at all, return empty string as a the
+           markdown document.
+
         5. Do not add anything else to the markdown document, just the list
-           as a single string. Especially, do not add any summary.
+           as a single string. Especially, do not add any summary or any
+           comment that all requirements have been met.
 
         The markdown document containing the compliance requirements is
         attached below:
