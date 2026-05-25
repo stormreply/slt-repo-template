@@ -242,35 +242,47 @@ fi
 # ── Markdown summary ─────────────────────────────────────────────────────────
 
 md_summary() {
-    echo "## Files copied"
-    echo ""
     if (( ${#MD_COPIED[@]} > 0 )); then
+        echo "Files missing"
+        echo ""
         for f in "${MD_COPIED[@]}"; do echo "- \`$f\`"; done
-    else
-        echo "_None_"
+        echo ""
     fi
-    echo ""
-    echo "## Files overwritten"
-    echo ""
     if (( ${#MD_OVERWRITTEN[@]} > 0 )); then
+        echo "Files not in sync"
+        echo ""
         for f in "${MD_OVERWRITTEN[@]}"; do echo "- \`$f\`"; done
-    else
-        echo "_None_"
+        echo ""
     fi
-    echo ""
-    echo "## Files with unwanted patterns"
-    echo ""
     if (( ${#MD_PATTERNS[@]} > 0 )); then
+        echo "Files with unwanted patterns"
+        echo ""
         for entry in "${MD_PATTERNS[@]}"; do echo "- $entry"; done
-    else
-        echo "_None_"
     fi
 }
 
-md=$(md_summary)
-echo "$md"
-[[ -n "${GITHUB_STEP_SUMMARY:-}" ]] && echo "$md" >> "$GITHUB_STEP_SUMMARY"
+
+write_step_summary() {
+    report=$1
+    if [ -n "$report" ] ; then
+        cat << EOF
+> [!CAUTION]
+> Issues have been found during file check. See below:
+
+$report
+EOF
+    else
+        echo "No compliance issues found."
+    fi
+}
+
 
 if (( FAILURES > 0 )); then
+
+    report=$(md_summary)
+    # echo "$report"
+    [[ -n "${GITHUB_STEP_SUMMARY:-}" ]] \
+    && write_step_summary(report) >> $GITHUB_STEP_SUMMARY
+
     exit 1
 fi

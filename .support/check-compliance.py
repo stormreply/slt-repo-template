@@ -98,7 +98,7 @@ def write_step_summary(report: str) -> None:
     with open(summary_path, "a", encoding="utf-8") as f:
         if report:
             f.write("> [!CAUTION]\n")
-            f.write("> Issues have been found during compliance check. See below.\n")
+            f.write("> Issues have been found during compliance check. See below\n")
             f.write("\n")
             f.write(report)
             f.write("\n")
@@ -121,7 +121,7 @@ def main() -> int:
     compliance_path = Path(compliance_file)
     if not compliance_path.is_file():
         print(
-            f"::error::Compliance-Datei nicht gefunden: {compliance_path}",
+            f"::error::Compliance-file not found: {compliance_path}",
             file=sys.stderr,
         )
         return 2
