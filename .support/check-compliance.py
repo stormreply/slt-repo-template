@@ -99,7 +99,7 @@ def write_step_summary(report: str) -> int:
     with open(summary_path, "a", encoding="utf-8") as f:
         if report:
             f.write("> [!CAUTION]\n")
-            f.write("> Issues have been found during compliance check. See below:\n")
+            f.write("> Issues have been found during compliance check. Check below:\n")
             f.write(report)
             return 1
         else:
