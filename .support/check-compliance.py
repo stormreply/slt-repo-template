@@ -91,10 +91,10 @@ def call_bedrock(model_id: str, region: str, system_prompt: str, user_prompt: st
     return "\n".join(parts).strip()
 
 
-def write_step_summary(report: str) -> None:
+def write_step_summary(report: str) -> int:
     summary_path = os.environ.get("GITHUB_STEP_SUMMARY")
     if not summary_path:
-        return
+        return 2
     with open(summary_path, "a", encoding="utf-8") as f:
         if report:
             f.write("> [!CAUTION]\n")
@@ -102,8 +102,10 @@ def write_step_summary(report: str) -> None:
             f.write("\n")
             f.write(report)
             f.write("\n")
+            return 1
         else:
             f.write("No compliance issues found.\n")
+            return 0
 
 
 def main() -> int:
@@ -184,7 +186,7 @@ def main() -> int:
     # print(report)
     write_step_summary(report)
 
-    return 0
+    return(write_step_summary(report))
 
 
 if __name__ == "__main__":

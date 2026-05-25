@@ -282,7 +282,7 @@ if (( FAILURES > 0 )); then
     report=$(md_summary)
     # echo "$report"
     [[ -n "${GITHUB_STEP_SUMMARY:-}" ]] \
-    && write_step_summary(report) >> $GITHUB_STEP_SUMMARY
+    && write_step_summary "$report" >> $GITHUB_STEP_SUMMARY
 
     exit 1
 fi
