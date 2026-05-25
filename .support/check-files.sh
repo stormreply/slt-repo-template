@@ -1,12 +1,31 @@
 #!/usr/bin/env bash
-# check-conformity.sh — Verify a Terraform repo conforms to the SLT template.
+# check-files.sh — Verify a Terraform repo conforms to the SLT template.
 # Run this script from the root of the repo you want to check.
+#
+# Options:
+#   --quiet,      -q   Suppress verbose terminal output (colors/sections)
+#   --list-files, -l   Print all collected template files before checking
 
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 TEMPLATE_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 TARGET_DIR="$(pwd)"
+
+# ── Flags ───────────────────────────────────────────────────────────────────
+
+VERBOSE=true
+LIST_FILES=false
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --quiet|-q)      VERBOSE=false; shift ;;
+        --list-files|-l) LIST_FILES=true;  shift ;;
+        *) echo "Unknown option: $1" >&2; exit 1 ;;
+    esac
+done
+
+# ── Colors ───────────────────────────────────────────────────────────────────
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -15,26 +34,30 @@ CYAN='\033[0;36m'
 BOLD='\033[1m'
 NC='\033[0m'
 
-CHECKS=0
-FAILURES=0
-declare -a DIFFS=()   # pairs: template_file target_file rel_path (3 elements each)
+# ── State ────────────────────────────────────────────────────────────────────
 
-# Files where differing content vs. the template is allowed (not overwritten).
+CHECKS=0
+declare -a DIFFS=()
+
 declare -a ALLOW_DIFF=(
     "providers.tf"
     "terraform.tf"
 )
 
-# Files to always delete from TARGET_DIR if present.
 declare -a DELETE_FILES=(
     "_metadata.tf"
     "_default_tags.tf"
 )
 
-# Patterns that must not appear in any .tf file in TARGET_DIR.
 declare -a UNWANTED_PATTERNS=(
     "local._name_tag"
 )
+
+declare -a MD_COPIED=()
+declare -a MD_OVERWRITTEN=()
+declare -a MD_PATTERNS=()
+
+# ── Helpers ──────────────────────────────────────────────────────────────────
 
 checksum() {
     if command -v sha256sum &>/dev/null; then
@@ -44,50 +67,73 @@ checksum() {
     fi
 }
 
-pass()   { echo -e "  ${GREEN}[PASS]${NC}    $1";              CHECKS=$((CHECKS + 1)); }
-fail()   { echo -e "  ${RED}[FAIL]${NC}    $1${2:+  ($2)}";    CHECKS=$((CHECKS + 1)); FAILURES=$((FAILURES + 1)); }
-hint()   { echo -e "  ${CYAN}[HINT]${NC}    $1${2:+  ($2)}";   CHECKS=$((CHECKS + 1)); }
-copied() { echo -e "  ${YELLOW}[COPY]${NC}    $1  ($2)";       CHECKS=$((CHECKS + 1)); FAILURES=$((FAILURES + 1)); }
-synced() { echo -e "  ${YELLOW}[SYNC]${NC}    $1  ($2)";       CHECKS=$((CHECKS + 1)); FAILURES=$((FAILURES + 1)); }
-deleted(){ echo -e "  ${YELLOW}[DELETED]${NC} $1${2:+  ($2)}"; CHECKS=$((CHECKS + 1)); }
+vecho() { $VERBOSE && echo -e "$@" || true; }
+
+pass()    { vecho "  ${GREEN}[PASS]${NC}    $1";              CHECKS=$((CHECKS + 1)); }
+fail()    { vecho "  ${RED}[FAIL]${NC}    $1${2:+  ($2)}";    CHECKS=$((CHECKS + 1)); }
+hint()    { vecho "  ${CYAN}[HINT]${NC}    $1${2:+  ($2)}";   CHECKS=$((CHECKS + 1)); }
+deleted() { vecho "  ${YELLOW}[DELETED]${NC} $1${2:+  ($2)}"; CHECKS=$((CHECKS + 1)); }
+copied()  { vecho "  ${YELLOW}[COPY]${NC}    $1  ($2)";       CHECKS=$((CHECKS + 1)); MD_COPIED+=("$1"); }
+synced()  { vecho "  ${YELLOW}[SYNC]${NC}    $1  ($2)";       CHECKS=$((CHECKS + 1)); MD_OVERWRITTEN+=("$1"); }
 
 DIVIDER="────────────────────────────────────────────────────────"
 
-echo ""
-echo -e "${BOLD}SLT Template Conformity Check${NC}"
-echo "$DIVIDER"
-echo "  Template : $TEMPLATE_ROOT"
-echo "  Target   : $TARGET_DIR"
-echo "$DIVIDER"
+if $VERBOSE; then
+    echo ""
+    echo -e "${BOLD}SLT Template Conformity Check${NC}"
+    echo "$DIVIDER"
+    echo "  Template : $TEMPLATE_ROOT"
+    echo "  Target   : $TARGET_DIR"
+    echo "$DIVIDER"
+fi
 
 # ── Collect template files ──────────────────────────────────────────────────
 
 declare -a TEMPLATE_FILES=()
+declare -a TEMPLATE_SOURCES=()  # parallel to TEMPLATE_FILES: "dir:NAME" or "file"
 
 add_dir() {
     local dir="$1"
     if [[ -d "$TEMPLATE_ROOT/$dir" ]]; then
         while IFS= read -r -d '' f; do
             TEMPLATE_FILES+=("$dir/$(basename "$f")")
+            TEMPLATE_SOURCES+=("dir:$dir")
         done < <(find "$TEMPLATE_ROOT/$dir" -maxdepth 1 -type f -print0 | sort -z)
+    fi
+}
+
+add_file() {
+    local f="$1"
+    if [[ -f "$TEMPLATE_ROOT/$f" ]]; then
+        TEMPLATE_FILES+=("$f")
+        TEMPLATE_SOURCES+=("file")
     fi
 }
 
 add_dir ".github/workflows"
 add_dir ".support"
+add_file "_sltconf.tf"
+add_file "providers.tf"
+add_file "terraform.tf"
 
-for f in "_sltconf.tf" "providers.tf" "terraform.tf"; do
-    [[ -f "$TEMPLATE_ROOT/$f" ]] && TEMPLATE_FILES+=("$f")
-done
+# ── List files ───────────────────────────────────────────────────────────────
+
+if $LIST_FILES; then
+    echo ""
+    echo "Template files:"
+    for i in "${!TEMPLATE_FILES[@]}"; do
+        printf "  [%-20s] %s\n" "${TEMPLATE_SOURCES[$i]}" "${TEMPLATE_FILES[$i]}"
+    done
+    echo ""
+fi
 
 # ── File integrity ──────────────────────────────────────────────────────────
 
-echo ""
-echo -e "${BOLD}File integrity${NC}"
-echo ""
+vecho ""
+vecho "${BOLD}File integrity${NC}"
+vecho ""
 
 for rel in "${TEMPLATE_FILES[@]}"; do
-    # Track root-level underscore filenames for the next section
     template_file="$TEMPLATE_ROOT/$rel"
     target_file="$TARGET_DIR/$rel"
 
@@ -111,9 +157,9 @@ done
 
 # ── File cleanup ───────────────────────────────────────────────────────────
 
-echo ""
-echo -e "${BOLD}File cleanup${NC}"
-echo ""
+vecho ""
+vecho "${BOLD}File cleanup${NC}"
+vecho ""
 
 cleanup_found=false
 for fname in "${DELETE_FILES[@]}"; do
@@ -131,9 +177,9 @@ fi
 
 # ── Pattern check ──────────────────────────────────────────────────────────
 
-echo ""
-echo -e "${BOLD}Pattern check (.tf files)${NC}"
-echo ""
+vecho ""
+vecho "${BOLD}Pattern check (.tf files)${NC}"
+vecho ""
 
 pattern_issues=false
 while IFS= read -r -d '' f; do
@@ -142,6 +188,7 @@ while IFS= read -r -d '' f; do
     for pattern in "${UNWANTED_PATTERNS[@]}"; do
         if grep -qF "$pattern" "$f"; then
             fail "$rel" "contains unwanted pattern: $pattern"
+            MD_PATTERNS+=("\`$rel\`: contains \`$pattern\`")
             pattern_issues=true
         fi
     done
@@ -154,7 +201,7 @@ fi
 
 # ── Diffs ───────────────────────────────────────────────────────────────────
 
-if (( ${#DIFFS[@]} > 0 )); then
+if $VERBOSE && (( ${#DIFFS[@]} > 0 )); then
     echo ""
     echo -e "${BOLD}Diffs (template vs target)${NC}"
 
@@ -176,17 +223,53 @@ if (( ${#DIFFS[@]} > 0 )); then
     done
 fi
 
-# ── Summary ─────────────────────────────────────────────────────────────────
+# ── Verbose terminal summary ─────────────────────────────────────────────────
 
-echo ""
-echo "$DIVIDER"
-if (( FAILURES == 0 )); then
-    echo -e "  ${GREEN}${BOLD}All $CHECKS checks passed.${NC}"
-else
-    echo -e "  ${RED}${BOLD}$FAILURES of $CHECKS checks failed.${NC}"
+FAILURES=$(( ${#MD_COPIED[@]} + ${#MD_OVERWRITTEN[@]} + ${#MD_PATTERNS[@]} ))
+
+if $VERBOSE; then
+    echo ""
+    echo "$DIVIDER"
+    if (( FAILURES == 0 )); then
+        echo -e "  ${GREEN}${BOLD}All $CHECKS checks passed.${NC}"
+    else
+        echo -e "  ${RED}${BOLD}$FAILURES of $CHECKS checks failed.${NC}"
+    fi
+    echo "$DIVIDER"
+    echo ""
 fi
-echo "$DIVIDER"
-echo ""
+
+# ── Markdown summary ─────────────────────────────────────────────────────────
+
+md_summary() {
+    echo "## Files copied"
+    echo ""
+    if (( ${#MD_COPIED[@]} > 0 )); then
+        for f in "${MD_COPIED[@]}"; do echo "- \`$f\`"; done
+    else
+        echo "_None_"
+    fi
+    echo ""
+    echo "## Files overwritten"
+    echo ""
+    if (( ${#MD_OVERWRITTEN[@]} > 0 )); then
+        for f in "${MD_OVERWRITTEN[@]}"; do echo "- \`$f\`"; done
+    else
+        echo "_None_"
+    fi
+    echo ""
+    echo "## Files with unwanted patterns"
+    echo ""
+    if (( ${#MD_PATTERNS[@]} > 0 )); then
+        for entry in "${MD_PATTERNS[@]}"; do echo "- $entry"; done
+    else
+        echo "_None_"
+    fi
+}
+
+md=$(md_summary)
+echo "$md"
+[[ -n "${GITHUB_STEP_SUMMARY:-}" ]] && echo "$md" >> "$GITHUB_STEP_SUMMARY"
 
 if (( FAILURES > 0 )); then
     exit 1

@@ -6,4 +6,8 @@ following set of rules:
 
 - `terraform.tf` must contain a `terraform {}` block
 
-- The `required_version` of Terraform in the terraform block must be >= 2
+- The `required_version` of Terraform in the terraform block must be >= 1
+
+- There must be a file called `./assets/architecture.drawio`
+
+- 

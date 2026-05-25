@@ -20,7 +20,7 @@ This demo can be built using GitHub Actions. In order to do so
 - [Install the Storm Library for Terraform](https://github.com/stormreply/storm-library-for-terraform/blob/main/docs/INSTALL-LIBRARY.md)
 - [Deploy this member repository](https://github.com/stormreply/storm-library-for-terraform/blob/main/docs/DEPLOY-MEMBER.md)
 
-Deployment of this member will take 10-20 minutes on GitHub resources.
+Deployment of this member will take x minutes on GitHub resources.
 
 ## Architecture
 
