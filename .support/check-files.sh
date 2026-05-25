@@ -267,6 +267,7 @@ write_step_summary() {
     cat << EOF
 > [!CAUTION]
 > Issues have been found during file check. Check below:
+
 $report
 EOF
 }

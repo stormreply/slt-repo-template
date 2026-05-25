@@ -100,6 +100,7 @@ def write_step_summary(report: str) -> int:
         if report != "No issues found.":
             f.write("> [!CAUTION]\n")
             f.write("> Issues have been found during compliance check. Check below:\n")
+            f.write("\n")
             f.write(report)
             return 1
         else:
@@ -185,7 +186,7 @@ def main() -> int:
 
     print(report)
 
-    return(write_step_summary(report))
+    return write_step_summary(report)
 
 
 if __name__ == "__main__":
