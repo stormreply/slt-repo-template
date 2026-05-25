@@ -277,5 +277,5 @@ if (( FAILURES > 0 )); then
     write_step_summary "$report" >> ${GITHUB_STEP_SUMMARY:-/dev/stdout}
     exit 1
 else
-    echo "No compliance issues found."
+    echo "No issues found."
 fi

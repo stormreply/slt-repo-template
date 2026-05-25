@@ -97,13 +97,13 @@ def write_step_summary(report: str) -> int:
     if not summary_path:
         return 2
     with open(summary_path, "a", encoding="utf-8") as f:
-        if report:
+        if report != "No issues found.":
             f.write("> [!CAUTION]\n")
             f.write("> Issues have been found during compliance check. Check below:\n")
             f.write(report)
             return 1
         else:
-            f.write("No compliance issues found.")
+            f.write(report)
             return 0
 
 
@@ -160,7 +160,7 @@ def main() -> int:
         3. If compliance issues have been found, return the list as outlined
            above as a markdown document in a single string.
 
-        4. If no issues have been found at all, return "No issues found".
+        4. If no issues have been found at all, return "No issues found.".
 
         5. Do not add anything else to the markdown document, just the list
            as a single string. Especially, do not add any summary or any
