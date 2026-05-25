@@ -160,8 +160,7 @@ def main() -> int:
         3. If compliance issues have been found, return the list as outlined
            above as a markdown document in a single string.
 
-        4. If no issues have been found at all, return empty string as a the
-           markdown document.
+        4. If no issues have been found at all, return an empty string.
 
         5. Do not add anything else to the markdown document, just the list
            as a single string. Especially, do not add any summary or any
