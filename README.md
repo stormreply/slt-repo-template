@@ -1,4 +1,4 @@
-# <!-- REPLACE --> SLT Repo Template
+# <!-- BEGIN_REPLACE -->SLT Repo Template<!-- END_REPLACE -->
 
 A template to be used for Storm Library for Terraform repositories.
 
@@ -20,7 +20,9 @@ This demo can be built using GitHub Actions. In order to do so
 - [Install the Storm Library for Terraform](https://github.com/stormreply/storm-library-for-terraform/blob/main/docs/INSTALL-LIBRARY.md)
 - [Deploy this member repository](https://github.com/stormreply/storm-library-for-terraform/blob/main/docs/DEPLOY-MEMBER.md)
 
-Deployment of this member will take [X] minutes on GitHub resources.
+Deployment of this member will take
+<!-- BEGIN_REPLACE --> x <!-- END_REPLACE -->
+minutes on GitHub resources.
 
 ## Architecture
 
@@ -30,11 +32,11 @@ Deployment of this member will take [X] minutes on GitHub resources.
 
 Follow these steps in order to explore this demo:
 
-1. [REPLACE] Provide a sequence of steps here that the user should follow
-   in order
-   to profit in the best way from this demo. In your description of steps,
-   assume users have solid knowledge of the AWS Console, but not more.
-1. ...
+1. <!-- BEGIN_REPLACE -->Provide a sequence of steps here that the user
+   should follow in order to profit in the best way from this demo. In
+   your description of steps, assume users have solid knowledge of the
+   AWS Console, but not more.<!-- END_REPLACE -->
+1. <!-- BEGIN_REPLACE --> ... <!-- END_REPLACE -->
 
 ## Terraform Docs
 
@@ -57,4 +59,5 @@ the README.md committed _before_ triggering a workflow.
 
 ## Credits
 
-- The Credits section is optional. But give credits where credit is due.
+- <!-- BEGIN_REPLACE -->The Credits section is optional. But give credits
+  where credit is due.<!-- END_REPLACE -->
