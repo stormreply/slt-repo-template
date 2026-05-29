@@ -11,3 +11,4 @@ following set of rules:
 - There must be a file called `./assets/architecture.drawio`
 
 - 
+
