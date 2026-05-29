@@ -23,6 +23,10 @@ This demo can be built using GitHub Actions. In order to do so
 Deployment of this member will take <!-- BEGIN_REPLACE --> _X_ <!-- END_REPLACE -->
 minutes on GitHub resources.
 
+## Architecture
+
+[Image]
+
 ## Explore this demo
 
 Follow these steps in order to explore this demo:
@@ -32,10 +36,6 @@ Follow these steps in order to explore this demo:
    your description of steps, assume users have solid knowledge of the
    AWS Console, but not more.<!-- END_REPLACE -->
 1. <!-- BEGIN_REPLACE --> ... <!-- END_REPLACE -->
-
-## Architecture
-
-[Image]
 
 ## Terraform Docs
 
