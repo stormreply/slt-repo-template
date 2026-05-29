@@ -10,7 +10,10 @@ following set of rules:
 
 - There must be a file called `./assets/architecture.drawio`
 
-- There must be a file called `./README.md`. That file must contain all
-  the sections in the same order that are in `./slt-repo-template`, in
-  the same order. Sections are starting with "## ". The "Credits" section
-  is optional.
+- The `README.md` must contain all section names that are in the reference
+  `README.md`, and in the same order.
+
+- The "## Credits" section in the `README.md` is optional.
+
+- The `.gitignore` must contain all entries that are in the reference
+  `.gitignore`, but may contain more.

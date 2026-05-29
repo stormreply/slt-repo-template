@@ -1,15 +1,16 @@
 """
-Bedrock-basierter Compliance-Check.
+Bedrock-based compliance check.
 
-Liest eine Markdown-Datei mit Compliance-Regeln, sammelt relevante Dateien
-aus dem aktuellen Repo, schickt beides an AWS Bedrock (Claude auf Bedrock)
-und schreibt das Ergebnis in den GitHub Step Summary.
+Reads a Markdown file containing compliance rules, collects relevant files
+from the current repo, submits both to AWS Bedrock (Claude on Bedrock)
+and writes the result to the GitHub Step Summary.
 
-Konfiguration via Environment-Variablen:
-  AWS_REGION         - AWS-Region in der Bedrock aktiviert ist (z.B. us-east-1)
-  BEDROCK_MODEL_ID   - Bedrock Model-ID bzw. Inference-Profile-ID
-                       (z.B. us.anthropic.claude-sonnet-4-6-YYYYMMDD-v1:0)
-  COMPLIANCE_FILE    - Pfad zur Compliance-Markdown-Datei (Default: compliance/compliance.md)
+configuration as environment variables:
+  AWS_REGION         - AWS region where bedrock is active (e.g. us-east-1)
+  BEDROCK_MODEL_ID   - Bedrock Model id (Inference profile id)
+                       (e.g. eu.anthropic.claude-sonnet-4-6)
+  COMPLIANCE_FILE    - path to file defining compliance rules
+                       (default: .support/compliance.md)
 """
 
 from __future__ import annotations
@@ -23,20 +24,8 @@ from botocore.exceptions import ClientError
 
 
 INCLUDED_FILES = [
-    ".github/workflows/apply.yaml",
-    ".github/workflows/destroy.yaml",
-    ".github/workflows/plan.yaml",
-    ".github/workflows/test.yaml",
     ".gitignore",
-    ".pre-commit-config.yaml",
-    ".support/check-commit.sh",
-    # ".support/check-compliance.py",
-    ".support/check-files.sh",
-    # ".support/compliance.md",
-    ".support/finish-pre-commit.sh",
-    ".support/prepare-pre-commit.sh",
     "assets/architecture.drawio",
-    "_sltconf.tf",
     "providers.tf",
     "README.md",
     "terraform.tf",
@@ -81,7 +70,10 @@ def call_bedrock(model_id: str, region: str, system_prompt: str, user_prompt: st
             modelId=model_id,
             system=[{"text": system_prompt}],
             messages=[{"role": "user", "content": [{"text": user_prompt}]}],
-            inferenceConfig={"maxTokens": 8000, "temperature": 0},
+            inferenceConfig={"maxTokens": 8000, "temperature": 1},
+            additionalModelRequestFields={
+                "thinking": {"type": "enabled", "budget_tokens": 2000}
+            },
         )
     except ClientError as e:
         print(f"::error::Bedrock-call failed: {e}", file=sys.stderr)
@@ -109,9 +101,10 @@ def write_step_summary(report: str) -> int:
 
 
 def main() -> int:
-    region = os.environ.get("AWS_REGION")
-    model_id = os.environ.get("BEDROCK_MODEL_ID")
-    compliance_file = os.environ.get("COMPLIANCE_FILE", "slt-repo-template/.support/compliance.md")
+    region = os.environ.get("AWS_REGION", "eu-central-1")
+    model_id = os.environ.get("BEDROCK_MODEL_ID", "eu.anthropic.claude-sonnet-4-6")
+    compliance_file = os.environ.get("COMPLIANCE_FILE", ".support/compliance.md")
+    reference_path = os.environ.get("REFERENCE_PATH", "../slt-repo-template")
 
     if not region or not model_id:
         print(
@@ -129,9 +122,10 @@ def main() -> int:
         return 2
 
     compliance_text = compliance_path.read_text(encoding="utf-8")
+    # print(compliance_text)
 
     repo_root = Path.cwd()
-    files = collect_repo_files(repo_root)
+    files = collect_repo_files(repo_root) + collect_repo_files(Path(reference_path))
     print(f"Collecting {len(files)} files for compliance check.", file=sys.stderr)
 
     repo_listing = build_repo_listing(files)
@@ -163,9 +157,9 @@ def main() -> int:
 
         4. If no issues have been found at all, return "No issues found.".
 
-        5. Do not add anything else to the markdown document, just the list
-           as a single string. Especially, do not add any summary or any
-           comment that all requirements have been met.
+        5. Begin your response immediately with the list or with
+           "No issues found." — no preamble, no introduction, no
+           considerations, no commentary of any kind.
 
         The markdown document containing the compliance requirements is
         attached below:
