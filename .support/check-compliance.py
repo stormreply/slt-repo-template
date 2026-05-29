@@ -6,11 +6,14 @@ from the current repo, submits both to AWS Bedrock (Claude on Bedrock)
 and writes the result to the GitHub Step Summary.
 
 configuration as environment variables:
-  AWS_REGION         - AWS region where bedrock is active (e.g. us-east-1)
+  AWS_REGION         - AWS region where bedrock is active
+                       (default: us-east-1)
   BEDROCK_MODEL_ID   - Bedrock Model id (Inference profile id)
-                       (e.g. eu.anthropic.claude-sonnet-4-6)
+                       (default: eu.anthropic.claude-sonnet-4-6)
   COMPLIANCE_FILE    - path to file defining compliance rules
                        (default: .support/compliance.md)
+  REFERENCE_PATH     - path to the slt-repo-template repository
+                       (default: ../slt-repo-template)
 """
 
 from __future__ import annotations
@@ -42,7 +45,7 @@ def collect_repo_files(root: Path) -> list[tuple[Path, str]]:
         try:
             data = path.read_bytes()
         except OSError:
-            print(f"::warning::Datei nicht gefunden oder nicht lesbar: {rel}", file=sys.stderr)
+            print(f"::warning::File not found or not readable: {rel}", file=sys.stderr)
             continue
 
         if len(data) > MAX_FILE_BYTES:
