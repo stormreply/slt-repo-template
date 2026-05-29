@@ -10,4 +10,7 @@ following set of rules:
 
 - There must be a file called `./assets/architecture.drawio`
 
--
+- There must be a file called `./README.md`. That file must contain all
+  the sections in the same order that are in `./slt-repo-template`, in
+  the same order. Sections are starting with "## ". The "Credits" section
+  is optional.
