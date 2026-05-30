@@ -1,5 +1,13 @@
 # <!-- BEGIN_REPLACE -->SLT Repo Template<!-- END_REPLACE -->
 
+<!-- BEGIN_REPLACE -->
+[![Check](https://github.com/stormreply/slt-member-example/actions/workflows/check.yaml/badge.svg)](https://github.com/stormreply/slt-member-example/actions/workflows/check.yaml)
+[![Plan](https://github.com/stormreply/slt-member-example/actions/workflows/plan.yaml/badge.svg)](https://github.com/stormreply/slt-member-example/actions/workflows/plan.yaml)
+[![Apply](https://github.com/stormreply/slt-member-example/actions/workflows/apply.yaml/badge.svg)](https://github.com/stormreply/slt-member-example/actions/workflows/apply.yaml)
+[![Test](https://github.com/stormreply/slt-member-example/actions/workflows/test.yaml/badge.svg)](https://github.com/stormreply/slt-member-example/actions/workflows/test.yaml)
+[![Destroy](https://github.com/stormreply/slt-member-example/actions/workflows/destroy.yaml/badge.svg)](https://github.com/stormreply/slt-member-example/actions/workflows/destroy.yaml)
+<!-- END_REPLACE -->
+
 A template to be used for Storm Library for Terraform repositories.
 
 #### Storm Library for Terraform
