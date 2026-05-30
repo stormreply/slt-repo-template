@@ -6,7 +6,7 @@
 [![Apply](https://github.com/stormreply/slt-member-example/actions/workflows/apply.yaml/badge.svg)](https://github.com/stormreply/slt-member-example/actions/workflows/apply.yaml)
 [![Test](https://github.com/stormreply/slt-member-example/actions/workflows/test.yaml/badge.svg)](https://github.com/stormreply/slt-member-example/actions/workflows/test.yaml)
 [![Destroy](https://github.com/stormreply/slt-member-example/actions/workflows/destroy.yaml/badge.svg)](https://github.com/stormreply/slt-member-example/actions/workflows/destroy.yaml)
-<!-- END_REPLACE -->
+END_REPLACE -->
 
 A template to be used for Storm Library for Terraform repositories.
 
@@ -28,7 +28,7 @@ This demo can be built using GitHub Actions. In order to do so
 - [Install the Storm Library for Terraform](https://github.com/stormreply/storm-library-for-terraform/blob/main/docs/INSTALL-LIBRARY.md)
 - [Deploy this member repository](https://github.com/stormreply/storm-library-for-terraform/blob/main/docs/DEPLOY-MEMBER.md)
 
-Deployment of this member will take <!-- BEGIN_REPLACE --> _X_ <!-- END_REPLACE -->
+Deployment of this member should take <!-- BEGIN_REPLACE --> _X_ <!-- END_REPLACE -->
 minutes on GitHub resources.
 
 ## Architecture

@@ -175,6 +175,50 @@ if ! $cleanup_found; then
     pass "no files to clean up"
 fi
 
+# ── Directory cleanup (stale files not in template) ────────────────────────
+
+vecho ""
+vecho "${BOLD}Directory cleanup${NC}"
+vecho ""
+
+declare -a MANAGED_DIRS=()
+for src in "${TEMPLATE_SOURCES[@]}"; do
+    if [[ "$src" == dir:* ]]; then
+        dir="${src#dir:}"
+        already=false
+        if [[ ${#MANAGED_DIRS[@]} -gt 0 ]]; then
+            for d in "${MANAGED_DIRS[@]}"; do
+                [[ "$d" == "$dir" ]] && { already=true; break; }
+            done
+        fi
+        $already || MANAGED_DIRS+=("$dir")
+    fi
+done
+
+dir_cleanup_found=false
+if [[ ${#MANAGED_DIRS[@]} -gt 0 ]]; then
+    for dir in "${MANAGED_DIRS[@]}"; do
+        target_subdir="$TARGET_DIR/$dir"
+        [[ -d "$target_subdir" ]] || continue
+        while IFS= read -r -d '' f; do
+            rel="$dir/$(basename "$f")"
+            in_template=false
+            for tf in "${TEMPLATE_FILES[@]}"; do
+                [[ "$tf" == "$rel" ]] && { in_template=true; break; }
+            done
+            if ! $in_template; then
+                rm "$f"
+                deleted "$rel" "not in template, removed"
+                dir_cleanup_found=true
+            fi
+        done < <(find "$target_subdir" -maxdepth 1 -type f -print0 | sort -z)
+    done
+fi
+
+if ! $dir_cleanup_found; then
+    pass "no stale files in managed directories"
+fi
+
 # ── Pattern check ──────────────────────────────────────────────────────────
 
 vecho ""
