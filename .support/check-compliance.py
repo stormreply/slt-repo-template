@@ -180,7 +180,7 @@ def main() -> int:
         {repo_listing}
     """
 
-    print(repo_listing)
+    # print(repo_listing)
     # print(system_prompt)
     # print(user_prompt)
 
