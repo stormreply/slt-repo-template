@@ -8,8 +8,6 @@ following set of rules:
 
 - The `required_version` of Terraform in the terraform block must be >= 1
 
-- There must be a file called `./assets/architecture.drawio`
-
 - The `README.md` must preserve all text that is not between the markers
   `<!-- BEGIN_REPLACE -->` and `<!-- END_REPLACE -->` in the reference
   `README.md`

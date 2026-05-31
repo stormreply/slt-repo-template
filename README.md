@@ -8,7 +8,9 @@
 [![Destroy](https://github.com/stormreply/slt-member-example/actions/workflows/destroy.yaml/badge.svg)](https://github.com/stormreply/slt-member-example/actions/workflows/destroy.yaml)
 END_REPLACE -->
 
+<!-- BEGIN_REPLACE -->
 A template to be used for Storm Library for Terraform repositories.
+<!-- END_REPLACE -->
 
 #### Storm Library for Terraform
 
@@ -33,7 +35,7 @@ minutes on GitHub resources.
 
 ## Architecture
 
-[Image]
+![Architecture](assets/architecture.drawio.svg)
 
 ## Explore this demo
 
