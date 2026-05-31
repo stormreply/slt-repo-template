@@ -39,13 +39,15 @@ minutes on GitHub resources.
 
 ## Explore this demo
 
+<!-- BEGIN_REPLACE -->
 Follow these steps in order to explore this demo:
 
-1. <!-- BEGIN_REPLACE -->Provide a sequence of steps here that the user
+1. Provide a sequence of steps here that the user
    should follow in order to profit in the best way from this demo. In
    your description of steps, assume users have solid knowledge of the
-   AWS Console, but not more.<!-- END_REPLACE -->
-1. <!-- BEGIN_REPLACE --> ... <!-- END_REPLACE -->
+   AWS Console, but not more.
+1. ...
+<!-- END_REPLACE -->
 
 ## Terraform Docs
 
