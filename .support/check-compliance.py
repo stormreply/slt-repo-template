@@ -50,11 +50,11 @@ def collect_repo_files(root: Path) -> list[tuple[Path, str]]:
 
         if len(data) > MAX_FILE_BYTES:
             text = data[:MAX_FILE_BYTES].decode("utf-8", errors="replace")
-            text += f"\n\n[... gekürzt, Originalgröße {len(data)} Bytes ...]"
+            text += f"\n\n[... shortened, original size: {len(data)} bytes ...]"
         else:
             text = data.decode("utf-8", errors="replace")
 
-        collected.append((Path(rel), text))
+        collected.append((Path(path), text))
 
     return collected
 
@@ -127,7 +127,7 @@ def main() -> int:
     compliance_text = compliance_path.read_text(encoding="utf-8")
     # print(compliance_text)
 
-    repo_root = Path.cwd()
+    repo_root = Path(".") # Path.cwd()
     files = collect_repo_files(repo_root) + collect_repo_files(Path(reference_path))
     print(f"Collecting {len(files)} files for compliance check.", file=sys.stderr)
 
@@ -164,6 +164,10 @@ def main() -> int:
            "No issues found." — no preamble, no introduction, no
            considerations, no commentary of any kind.
 
+        6. Whenever you need to compare a file to a reference file, that
+           reference file will be found under the same part, starting from
+           {reference_path} .
+
         The markdown document containing the compliance requirements is
         attached below:
 
@@ -176,6 +180,7 @@ def main() -> int:
         {repo_listing}
     """
 
+    print(repo_listing)
     # print(system_prompt)
     # print(user_prompt)
 
