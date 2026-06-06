@@ -134,7 +134,7 @@ add_file() {
 }
 
 add_dir ".github/workflows"
-# add_dir ".support"
+add_file ".gitignore"
 add_file ".support/finish-pre-commit.sh"
 add_file ".support/prepare-pre-commit.sh"
 add_file "_sltconf.tf"
