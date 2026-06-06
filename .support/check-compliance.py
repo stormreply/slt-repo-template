@@ -106,7 +106,7 @@ def write_step_summary(report: str) -> int:
 def main() -> int:
     region = os.environ.get("AWS_REGION", "eu-central-1")
     model_id = os.environ.get("BEDROCK_MODEL_ID", "eu.anthropic.claude-sonnet-4-6")
-    compliance_file = os.environ.get("COMPLIANCE_FILE", ".support/compliance.md")
+    compliance_file = os.environ.get("COMPLIANCE_FILE", "../slt-repo-template/.support/compliance.md")
     reference_path = os.environ.get("REFERENCE_PATH", "../slt-repo-template")
 
     if not region or not model_id:
@@ -165,7 +165,7 @@ def main() -> int:
            considerations, no commentary of any kind.
 
         6. Whenever you need to compare a file to a reference file, that
-           reference file will be found under the same part, starting from
+           reference file will be found under the same path, starting from
            {reference_path} .
 
         The markdown document containing the compliance requirements is
