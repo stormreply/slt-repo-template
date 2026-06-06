@@ -44,7 +44,6 @@ done
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
-CYAN='\033[0;36m'
 BOLD='\033[1m'
 NC='\033[0m'
 
@@ -65,6 +64,8 @@ declare -a DELETE_FILES=(
     ".support/check-code.sh"
     ".support/check-commit.sh"
     ".support/check-compliance.py"
+    ".support/check-conformity.sh"
+    ".support/slt-check.sh"
     ".support/check-files.sh"
     ".support/compliance.md"
 )
@@ -76,6 +77,7 @@ declare -a UNWANTED_PATTERNS=(
 declare -a MD_COPIED=()
 declare -a MD_OVERWRITTEN=()
 declare -a MD_PATTERNS=()
+declare -a MD_DELETED=()
 
 # ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -91,10 +93,10 @@ vecho() { $VERBOSE && echo -e "$@" || true; }
 
 pass()    { vecho "  ${GREEN}[PASS]${NC}    $1";              CHECKS=$((CHECKS + 1)); }
 fail()    { vecho "  ${RED}[FAIL]${NC}    $1${2:+  ($2)}";    CHECKS=$((CHECKS + 1)); }
-hint()    { vecho "  ${CYAN}[HINT]${NC}    $1${2:+  ($2)}";   CHECKS=$((CHECKS + 1)); }
-deleted() { vecho "  ${YELLOW}[DELETED]${NC} $1${2:+  ($2)}"; CHECKS=$((CHECKS + 1)); }
-copied()  { vecho "  ${YELLOW}[COPY]${NC}    $1  ($2)";       CHECKS=$((CHECKS + 1)); MD_COPIED+=("$1"); }
-synced()  { vecho "  ${YELLOW}[SYNC]${NC}    $1  ($2)";       CHECKS=$((CHECKS + 1)); MD_OVERWRITTEN+=("$1"); }
+hint()    { vecho "  ${YELLOW}[HINT]${NC}    $1${2:+  ($2)}"; CHECKS=$((CHECKS + 1)); }
+deleted() { vecho "  ${RED}[DELETED]${NC} $1${2:+  ($2)}";    CHECKS=$((CHECKS + 1)); MD_DELETED+=("$1"); }
+copied()  { vecho "  ${RED}[COPY]${NC}    $1  ($2)";          CHECKS=$((CHECKS + 1)); MD_COPIED+=("$1"); }
+synced()  { vecho "  ${RED}[SYNC]${NC}    $1  ($2)";          CHECKS=$((CHECKS + 1)); MD_OVERWRITTEN+=("$1"); }
 
 DIVIDER="────────────────────────────────────────────────────────"
 
@@ -291,7 +293,7 @@ fi
 
 # ── Verbose terminal summary ─────────────────────────────────────────────────
 
-FAILURES=$(( ${#MD_COPIED[@]} + ${#MD_OVERWRITTEN[@]} + ${#MD_PATTERNS[@]} ))
+FAILURES=$((${#MD_COPIED[@]} + ${#MD_OVERWRITTEN[@]} + ${#MD_PATTERNS[@]} + ${#MD_DELETED[@]} ))
 
 if $VERBOSE; then
     echo ""
@@ -324,6 +326,11 @@ md_summary() {
         echo "Files with unwanted patterns"
         echo ""
         for entry in "${MD_PATTERNS[@]}"; do echo "- $entry"; done
+    fi
+    if (( ${#MD_PATTERNS[@]} > 0 )); then
+        echo "Files to be deleted"
+        echo ""
+        for entry in "${MD_DELETED[@]}"; do echo "- $entry"; done
     fi
 }
 
