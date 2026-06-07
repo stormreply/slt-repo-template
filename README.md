@@ -1,3 +1,4 @@
+### Storm Library for Terraform
 # <!-- BEGIN_REPLACE -->SLT Repo Template<!-- END_REPLACE -->
 
 <!-- BEGIN_REPLACE -->
@@ -11,8 +12,6 @@ A template to be used for Storm Library for Terraform repositories.
 [![Test](https://github.com/stormreply/slt-member-example/actions/workflows/test.yaml/badge.svg)](https://github.com/stormreply/slt-member-example/actions/workflows/test.yaml)
 [![Destroy](https://github.com/stormreply/slt-member-example/actions/workflows/destroy.yaml/badge.svg)](https://github.com/stormreply/slt-member-example/actions/workflows/destroy.yaml)
 END_REPLACE -->
-
-#### Storm Library for Terraform
 
 This repository is a member of the SLT | Storm Library for Terraform,
 a collection of Terraform modules for Amazon Web Services. The focus
