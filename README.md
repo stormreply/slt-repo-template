@@ -48,10 +48,8 @@ Follow these steps in order to explore this demo:
 1. ...
 <!-- END_REPLACE -->
 
-## Terraform Docs
-
 <details>
-<summary>Click to show</summary>
+<summary><h2>Terraform Docs</h2></summary>
 
 <!-- BEGIN_TF_DOCS -->
 
