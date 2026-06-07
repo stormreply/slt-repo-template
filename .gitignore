@@ -23,5 +23,9 @@
 # Python virtual environment
 .venv
 .python-version
+main.py
 pyproject.toml
 uv.lock
+
+# TODOs
+*TODO*
